@@ -7,6 +7,6 @@ import (
 
 func main()  {
 	modle.InitDB()
-
+	//开启消费者进行消费
 	mq.OpenConsumer()
 }

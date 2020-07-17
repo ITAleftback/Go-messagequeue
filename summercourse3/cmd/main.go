@@ -11,7 +11,7 @@ func main(){
 	router:=gin.Default()
 	//这个函数是我拿来加电影的，方便后面的程序找到相应的电影并把库存-1
 	router.POST("addmoives",controller.Addmovies)
-
+	//抢票下单的接口
 	router.POST("/makeorder",controller.Makeorder)
 	router.Run(":8080")
 

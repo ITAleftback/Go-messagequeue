@@ -22,6 +22,7 @@ func Addmovies(c *gin.Context){
 		Moive_Positon: moive_Position,
 		Moive_Num:     moiveNum,
 	}
+	//传递给 加电影的方法
 	moive.Addmoives()
 	c.JSON(200,gin.H{"status":200,"info":"success"})
 
@@ -38,6 +39,7 @@ func Makeorder(c *gin.Context){
 		User_ID: userID ,
 		Moive_ID: moiveID,
 	}
+	//当作参数传递给生产者函数，生产者将之放进消息队列
 	mq.Makeorder(order)
 
 

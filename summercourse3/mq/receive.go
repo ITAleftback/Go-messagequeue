@@ -9,20 +9,20 @@ import (
 	"summercourse3/modle"
 )
 
-//拿出消息队列的数据将信息写入订单表
+//拿出消息队列的数据将信息写入订单表，消费者
 func OpenConsumer(){
-
+	//连接队列
 	conn,err:=amqp.Dial("amqp://guest:guest@localhost:5672/")
 	message.HandleError(err,"Can't connect to MQ")
 	defer conn.Close()
 	amqpChannel,err:=conn.Channel()
 	message.HandleError(err,"Can't create a amqpChannel")
 	defer amqpChannel.Close()
+	//想要连接的队列名，及其设置
 	queue,err:=amqpChannel.QueueDeclare("orderlist",true,false,false,false,nil)
 	message.HandleError(err,"Could not declare `add` queue")
 	err = amqpChannel.Qos(1, 0, false)
 	message.HandleError(err, "Could not configure QoS")
-
 
 	messageChannel,err:=amqpChannel.Consume(queue.Name,
 		"",
@@ -36,10 +36,12 @@ func OpenConsumer(){
 	stopChan :=make(chan bool)
 	go func() {
 		log.Printf("Consumer ready,PID:%d",os.Getpid())
+		//遍历消息队列并拿出数据
 		for d:=range messageChannel{
 			log.Printf("Received a message:%s",string(d.Body))
 			order:=&modle.Order{}
 			err:=json.Unmarshal(d.Body,order)
+			//此时，order就是消息队列拿出的数据
 			if err != nil {
 				log.Printf("Error decoding JSON:%s",err)
 			}
@@ -61,6 +63,6 @@ func OpenConsumer(){
 			}
 		}
 	}()
-
+	//关闭进程， 原理好像是channel阻塞？
 	<-stopChan
 }
